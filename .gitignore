@@ -1,0 +1,19 @@
+# 编译产物
+build/
+out/
+*.class
+
+# 测试下载的第三方 runner（仅 CI 临时使用）
+junit.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# 系统 / 临时
+.DS_Store
+*.log
