@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ['17', '21']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Download JUnit standalone runner
+        run: curl -fsSL -o junit.jar https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.2/junit-platform-console-standalone-1.10.2.jar
+
+      - name: Compile main sources
+        run: |
+          mkdir -p build/classes build/test-classes
+          javac -d build/classes $(find src/main/java -name '*.java')
+
+      - name: Compile test sources
+        run: javac -cp "build/classes:junit.jar" -d build/test-classes $(find src/test/java -name '*.java')
+
+      - name: Run tests
+        run: java -jar junit.jar execute -cp "build/classes:build/test-classes:junit.jar" --scan-class-path --details=tree
